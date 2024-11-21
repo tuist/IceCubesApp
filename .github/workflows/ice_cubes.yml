@@ -1,0 +1,26 @@
+name: Ice Cubes
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    name: Build Ice Cubes
+    runs-on: macos-15
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/mise-action@v2
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode_16.0.app
+      - name: Prepare xcconfig
+        run: cp IceCubesApp.xcconfig.template IceCubesApp.xcconfig
+      - name: Build Ice Cubes
+        run: xcodebuild -scheme IceCubesApp -destination 'platform=iOS Simulator,name=iPhone 16' -configuration "Debug" build
+      - name: Share Ice Cubes
+        run: mise x -- tuist share "Ice Cubes" --configuration Debug --platforms ios
+        env:
+          TUIST_CONFIG_TOKEN: ${{ secrets.TUIST_CONFIG_TOKEN }}
